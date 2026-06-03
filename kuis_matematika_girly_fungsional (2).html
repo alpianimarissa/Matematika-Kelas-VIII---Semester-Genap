@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kuis Matematika Kelas VIII</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        .nav-active { border: 2px solid #ec4899 !important; background-color: #fdf2f8 !important; }
+        .topic-active { background-color: #ec4899 !important; color: white !important; }
+    </style>
+</head>
+<body class="bg-pink-50 min-h-screen font-sans text-gray-800">
+
+    <header class="bg-white p-6 shadow-sm border-b border-pink-100">
+        <div class="max-w-6xl mx-auto">
+            <h1 class="text-2xl font-bold text-pink-600">Matematika Kelas VIII - Semester Genap</h1>
+            <div class="flex flex-wrap gap-2 mt-4" id="topic-nav">
+                <button onclick="changeTopic('Relasi & Fungsi', this)" class="topic-btn px-3 py-1.5 rounded-full text-xs font-medium transition bg-pink-500 text-white topic-active">Relasi & Fungsi</button>
+                <button onclick="changeTopic('Pemetaan', this)" class="topic-btn px-3 py-1.5 rounded-full text-xs font-medium transition bg-pink-100">Pemetaan</button>
+                <button onclick="changeTopic('Gradien', this)" class="topic-btn px-3 py-1.5 rounded-full text-xs font-medium transition bg-pink-100">Gradien</button>
+                <button onclick="changeTopic('Garis Lurus', this)" class="topic-btn px-3 py-1.5 rounded-full text-xs font-medium transition bg-pink-100">Garis Lurus</button>
+                <button onclick="changeTopic('Statistika', this)" class="topic-btn px-3 py-1.5 rounded-full text-xs font-medium transition bg-pink-100">Statistika</button>
+                <button onclick="changeTopic('Kuartil & Jangkauan', this)" class="topic-btn px-3 py-1.5 rounded-full text-xs font-medium transition bg-pink-100">Kuartil & Jangkauan</button>
+            </div>
+        </div>
+    </header>
+
+    <main class="max-w-6xl mx-auto p-6 grid grid-cols-1 lg:grid-cols-3 gap-6 mt-4">
+        <section class="lg:col-span-2 space-y-6">
+            <div class="bg-white p-8 rounded-3xl shadow-sm border border-pink-100">
+                <div class="flex justify-between items-center mb-6">
+                    <span id="question-meta" class="text-pink-500 font-bold text-sm tracking-wide uppercase">SOAL 1</span>
+                    <span id="topic-tag" class="bg-pink-100 text-pink-700 px-3 py-1 rounded-full text-xs font-semibold">RELASI & FUNGSI</span>
+                </div>
+                <p id="question-text" class="text-xl font-medium text-gray-700 mb-8 min-h-[80px]">Memuat soal...</p>
+                <div class="mb-8">
+                    <label class="block text-sm font-semibold text-gray-500 mb-2">JAWABAN ANDA:</label>
+                    <input type="number" id="answer-input" placeholder="Masukkan angka saja" class="w-full p-4 text-lg border-2 border-pink-100 rounded-2xl focus:border-pink-400 focus:outline-none transition">
+                </div>
+                <div class="flex justify-between items-center">
+                    <button onclick="skipQuestion()" class="text-gray-400 hover:text-gray-600">Lewati</button>
+                    <button onclick="validateAnswer()" class="bg-pink-600 hover:bg-pink-700 text-white px-8 py-3 rounded-2xl font-bold transition shadow-lg shadow-pink-200">Periksa Jawaban</button>
+                </div>
+            </div>
+        </section>
+
+        <section class="lg:col-span-1">
+            <div class="bg-white p-6 rounded-3xl shadow-sm border border-pink-100">
+                <h3 class="font-bold text-gray-700 mb-4">Navigasi Soal</h3>
+                <div class="grid grid-cols-5 gap-2 mb-6" id="nav-grid"></div>
+                <div class="flex justify-between text-sm font-medium border-t pt-4">
+                    <span class="text-gray-500">Selesai: <span id="done-count">0</span>/10</span>
+                    <span class="text-green-500">Benar: <span id="correct-count">0</span></span>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <script>
+        const allQuestions = [
+            { t: "Relasi & Fungsi", q: "Jika f(x) = 2x + 3, nilai f(2) adalah?", a: 7 },
+            { t: "Relasi & Fungsi", q: "Jika f(x) = 3x - 1, nilai f(-1) adalah?", a: -4 },
+            { t: "Relasi & Fungsi", q: "f(x) = x + 5. Jika f(a) = 9, maka a adalah...", a: 4 },
+            { t: "Relasi & Fungsi", q: "Jika f(x) = 5 - x, maka f(3) adalah...", a: 2 },
+            { t: "Relasi & Fungsi", q: "Nilai f(0) dari f(x) = 2x + 10 adalah...", a: 10 },
+            { t: "Relasi & Fungsi", q: "Jika f(x) = x^2, nilai f(3) adalah...", a: 9 },
+            { t: "Relasi & Fungsi", q: "f(x) = 4x - 2, nilai f(1) adalah...", a: 2 },
+            { t: "Relasi & Fungsi", q: "Nilai f(5) dari f(x) = x + 1 adalah...", a: 6 },
+            { t: "Relasi & Fungsi", q: "f(x) = 3x. Nilai f(4) adalah...", a: 12 },
+            { t: "Relasi & Fungsi", q: "Nilai f(-2) dari f(x) = x + 2 adalah...", a: 0 },
+            
+            { t: "Pemetaan", q: "Pemetaan A={a,b} ke B={1,2,3}, banyak pemetaan adalah...", a: 9 },
+            { t: "Pemetaan", q: "Pemetaan dari A={1,2,3} ke B={a,b}, banyak pemetaan...", a: 8 },
+            { t: "Pemetaan", q: "Pemetaan dari A={1} ke B={1,2,3,4}, banyak pemetaan...", a: 4 },
+            { t: "Pemetaan", q: "Banyak pemetaan dari A={a,b,c} ke B={1,2} adalah...", a: 8 },
+            { t: "Pemetaan", q: "Banyak pemetaan dari A={1,2} ke B={a,b,c,d,e} adalah...", a: 25 },
+            { t: "Pemetaan", q: "Pemetaan A={a} ke B={1,2,3} adalah...", a: 3 },
+            { t: "Pemetaan", q: "Pemetaan dari A={1,2} ke B={1,2} adalah...", a: 4 },
+            { t: "Pemetaan", q: "Jika n(A)=2, n(B)=2, banyak pemetaan adalah...", a: 4 },
+            { t: "Pemetaan", q: "Jika n(A)=3, n(B)=3, banyak pemetaan adalah...", a: 27 },
+            { t: "Pemetaan", q: "Pemetaan dari A={a,b,c,d} ke B={1} adalah...", a: 1 },
+
+            { t: "Gradien", q: "Gradien y = 3x + 2 adalah...", a: 3 },
+            { t: "Gradien", q: "Gradien y = -x + 5 adalah...", a: -1 },
+            { t: "Gradien", q: "Gradien 2y = 4x + 8 adalah...", a: 2 },
+            { t: "Gradien", q: "Gradien y = 0.5x - 3 adalah...", a: 0 },
+            { t: "Gradien", q: "Gradien garis yang melalui (0,0) dan (1,2) adalah...", a: 2 },
+            { t: "Gradien", q: "Gradien garis y = 5x - 1 adalah...", a: 5 },
+            { t: "Gradien", q: "Gradien y = -2x + 10 adalah...", a: -2 },
+            { t: "Gradien", q: "Gradien 3y = 6x + 9 adalah...", a: 2 },
+            { t: "Gradien", q: "Gradien garis y = x + 1 adalah...", a: 1 },
+            { t: "Gradien", q: "Gradien garis y = -4x + 2 adalah...", a: -4 },
+
+            { t: "Garis Lurus", q: "Garis (0,0) bergradien 4 persamaannya y = ... x", a: 4 },
+            { t: "Garis Lurus", q: "Garis gradien 2 melalui (0,3) adalah y = 2x + ...", a: 3 },
+            { t: "Garis Lurus", q: "Garis gradien 1 melalui (0,5) adalah y = x + ...", a: 5 },
+            { t: "Garis Lurus", q: "Garis gradien -1 melalui (0,2) adalah y = -x + ...", a: 2 },
+            { t: "Garis Lurus", q: "Garis gradien 3 melalui (0,0) adalah y = ... x", a: 3 },
+            { t: "Garis Lurus", q: "y = 2x + 1, potong sumbu Y di titik (0,...)", a: 1 },
+            { t: "Garis Lurus", q: "y = 4x - 2, potong sumbu Y di titik (0,...)", a: -2 },
+            { t: "Garis Lurus", q: "y = 5x + 3, potong sumbu Y di titik (0,...)", a: 3 },
+            { t: "Garis Lurus", q: "y = -x + 7, potong sumbu Y di titik (0,...)", a: 7 },
+            { t: "Garis Lurus", q: "y = 6x - 4, potong sumbu Y di titik (0,...)", a: -4 },
+
+            { t: "Statistika", q: "Mean dari 5, 6, 7, 8, 9 adalah...", a: 7 },
+            { t: "Statistika", q: "Mean dari 4, 4, 4, 5, 5 adalah...", a: 4 },
+            { t: "Statistika", q: "Modus dari 2, 3, 3, 4, 3 adalah...", a: 3 },
+            { t: "Statistika", q: "Median dari 1, 2, 4, 5, 6 adalah...", a: 4 },
+            { t: "Statistika", q: "Mean dari 10, 12, 14, 16 adalah...", a: 13 },
+            { t: "Statistika", q: "Modus dari 7, 8, 7, 9, 8, 7 adalah...", a: 7 },
+            { t: "Statistika", q: "Median dari 3, 7, 5, 9, 8 adalah...", a: 7 },
+            { t: "Statistika", q: "Mean dari 2, 4, 6 adalah...", a: 4 },
+            { t: "Statistika", q: "Modus dari 1, 2, 2, 3, 3, 3 adalah...", a: 3 },
+            { t: "Statistika", q: "Mean dari 1, 1, 1 adalah...", a: 1 },
+
+            { t: "Kuartil & Jangkauan", q: "Q1 dari 1, 2, 3, 4, 5, 6, 7 adalah...", a: 2 },
+            { t: "Kuartil & Jangkauan", q: "Q3 dari 1, 2, 3, 4, 5, 6, 7 adalah...", a: 6 },
+            { t: "Kuartil & Jangkauan", q: "Jangkauan antar kuartil 1, 2, 3, 4, 5 adalah...", a: 2 },
+            { t: "Kuartil & Jangkauan", q: "Median (Q2) dari 2, 4, 6, 8, 10 adalah...", a: 6 },
+            { t: "Kuartil & Jangkauan", q: "Jika Q1 = 3, Q3 = 9, jangkauan antar kuartilnya...", a: 6 },
+            { t: "Kuartil & Jangkauan", q: "Data 3, 4, 4, 5, 6, 8, 8. Nilai Q1 adalah...", a: 4 },
+            { t: "Kuartil & Jangkauan", q: "Data 3, 4, 4, 5, 6, 8, 8. Nilai Q3 adalah...", a: 8 },
+            { t: "Kuartil & Jangkauan", q: "Data 1, 3, 5, 7. Nilai Q1 adalah...", a: 2 },
+            { t: "Kuartil & Jangkauan", q: "Jangkauan dari 10, 20, 30, 40, 50 adalah...", a: 40 },
+            { t: "Kuartil & Jangkauan", q: "Data 1, 2, 3, 4, 5. Kuartil bawah (Q1) adalah...", a: 2 }
+        ];
+
+        let currentTopic = "Relasi & Fungsi";
+        let questions = allQuestions.filter(q => q.t === currentTopic);
+        let currentIdx = 0;
+        let score = 0;
+        let answeredStatus = new Array(allQuestions.length).fill(null);
+
+        function changeTopic(topic, btn) {
+            currentTopic = topic;
+            questions = allQuestions.filter(q => q.t === topic);
+            currentIdx = 0;
+            document.querySelectorAll('.topic-btn').forEach(b => b.classList.remove('topic-active', 'bg-pink-500', 'text-white'));
+            btn.classList.add('topic-active', 'bg-pink-500', 'text-white');
+            renderNav();
+            updateUI();
+        }
+
+        function updateUI() {
+            document.getElementById('question-text').innerText = questions[currentIdx].q;
+            document.getElementById('topic-tag').innerText = questions[currentIdx].t;
+            document.getElementById('question-meta').innerText = `SOAL ${currentIdx + 1} DARI ${questions.length}`;
+            document.getElementById('answer-input').value = "";
+            document.querySelectorAll('.nav-btn').forEach((btn, i) => {
+                btn.classList.toggle('nav-active', i === currentIdx);
+            });
+        }
+
+        function validateAnswer() {
+            const val = parseInt(document.getElementById('answer-input').value);
+            const globalIdx = allQuestions.indexOf(questions[currentIdx]);
+            const btn = document.querySelectorAll('.nav-btn')[currentIdx];
+            if(val === questions[currentIdx].a) {
+                if(answeredStatus[globalIdx] !== 'correct') { score++; answeredStatus[globalIdx] = 'correct'; btn.classList.add('bg-pink-500', 'text-white', 'border-pink-500'); }
+                alert("Jawaban Benar! ✨");
+            } else {
+                if(answeredStatus[globalIdx] !== 'wrong') { answeredStatus[globalIdx] = 'wrong'; btn.classList.add('bg-red-500', 'text-white', 'border-red-500'); }
+                alert("Jawaban salah, coba lagi ya! 🌸");
+            }
+            document.getElementById('done-count').innerText = answeredStatus.filter(x => x !== null).length;
+            document.getElementById('correct-count').innerText = score;
+        }
+
+        function skipQuestion() { currentIdx = (currentIdx + 1) % questions.length; updateUI(); }
+
+        function renderNav() {
+            const navGrid = document.getElementById('nav-grid');
+            navGrid.innerHTML = '';
+            questions.forEach((_, i) => {
+                const btn = document.createElement('button');
+                btn.className = "nav-btn w-9 h-9 rounded-xl border border-gray-200 transition font-bold text-xs";
+                btn.innerText = i + 1;
+                btn.onclick = () => { currentIdx = i; updateUI(); };
+                navGrid.appendChild(btn);
+            });
+        }
+
+        renderNav();
+        updateUI();
+    </script>
+</body>
+</html>
